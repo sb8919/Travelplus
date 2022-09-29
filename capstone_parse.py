@@ -154,8 +154,8 @@ def parsing(driver,url,pl):
 
 
 
-id = "parsingtag"
-pw = "zoqtmxhs"
+id = ""
+pw = ""
 hashtag="가볼만한곳"
 
 parse_start(id,pw,hashtag)
