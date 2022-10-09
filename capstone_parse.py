@@ -10,7 +10,6 @@ from tkinter import ttk
 import tkinter as tk
 import pandas as pd
 
-
 # 전국 지역 이름 파싱
 def get_place():
     url = 'https://ko.wikipedia.org/wiki/%EB%8C%80%ED%95%9C%EB%AF%BC%EA%B5%AD%EC%9D%98_%EA%B8%B0%EC%B4%88%EC%9E%90%EC%B9%98%EB%8B%A8%EC%B2%B4_%EB%AA%A9%EB%A1%9D'
