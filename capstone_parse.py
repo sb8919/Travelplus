@@ -5,9 +5,6 @@ import time
 import re
 import time
 import requests
-from tkinter import *
-from tkinter import ttk
-import tkinter as tk
 import pandas as pd
 
 # 전국 지역 이름 파싱
@@ -152,7 +149,7 @@ def parsing(driver,url,pl):
         print("저장된 내용 없음")
 
 
-
+# 인스타그램 아이디, 비번, 해시태그 입력하는곳
 id = ""
 pw = ""
 hashtag="가볼만한곳"
