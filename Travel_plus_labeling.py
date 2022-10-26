@@ -30,9 +30,6 @@ for i in range(list_count):
     labeling(str(test_list[i][0]),str(test_list[i][1]),str(test_list[i][2]),str(test_list[i][3]))
     
 
-print(len(label_output[1]))
-print(label_output[0])
-
 label_df = pd.DataFrame(label_output)
 label_df.columns = ['장소','본문','태그','1.가볼만한곳','2.가족여행', '3.우정여행', '4.전통','5.체험', '6.캠핑','7.관람','8.맛집', '9.카페']
 label_df.to_excel('강진_크롤링_v2.xlsx')
