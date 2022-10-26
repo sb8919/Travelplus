@@ -45,7 +45,7 @@ def labeling(url,place,main,tags):
 
         label_output.append(sel_list)
     
-for i in range(3):
+for i in range(list_count):
     clear_output(wait=True) # 창 초기화
     print('------------------------------[ '+str(i+1)+'번째 게시글 ]------------------------------')
     labeling(str(test_list[i][0]),str(test_list[i][1]),str(test_list[i][2]),str(test_list[i][3]))
