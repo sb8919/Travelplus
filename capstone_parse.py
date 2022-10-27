@@ -17,9 +17,13 @@ def get_place():
     place_s = place_soup.select('div.mw-parser-output > table > tbody > tr > td > a')
 
     count = 0
+
     for p in place_s:
         p = str(p)
         place_s[count] = p.split('<')[1].split('>')[1]
+        if len(place_s[count]) == 2:
+            continue
+        place_s[count] = place_s[count].rstrip('시군구')
         count += 1
     return place_s
 
@@ -42,8 +46,11 @@ def get_content(driver):
     # 본문 내용
     try:
         content = soup.select('div._a9zs')[0].text
-        if content.find('나이트') != -1:
-            content = 'spam'
+        list = ['부업', '재테크', '출금', '공짜', '수익', '카톡', '원금', '할인', '부자', 'Repost', '구매', '나이트', '클럽',
+                '태풍', '사고', '글귀', '숙제', '과제', '책', '가방']
+        for i in list:
+            if content.find(i) != -1:
+                content = 'spam'
     except:
         content = ' '
 
@@ -73,7 +80,7 @@ def get_content(driver):
 def move_next(driver):
     try:
         driver.find_element(By.CSS_SELECTOR,"div._aaqg._aaqh > button").click()
-        time.sleep(3)
+        time.sleep(5)
     except:
         return 'none'
 
@@ -82,7 +89,7 @@ def parse_start(id, pw, hashtag):
     driver = webdriver.Chrome('chromedriver.exe')
 
     driver.get('https://www.instagram.com')
-    time.sleep(3)
+    time.sleep(5)
 
     # 인스타그램 로그인을 위한 계정 정보
     insta_id = id
@@ -91,8 +98,7 @@ def parse_start(id, pw, hashtag):
     input_id.send_keys(insta_id)
 
     password = pw
-    input_pw = driver.find_element(By.CSS_SELECTOR,
-                                   '#loginForm > div.qF0y9.Igw0E.IwRSH.eGOV_.acqo5._4EzTm.kEKum > div:nth-child(2) > div > label > input')
+    input_pw = driver.find_element(By.CSS_SELECTOR, ' #loginForm > div > div:nth-child(2) > div > label > input')
 
     input_pw.clear()
     input_pw.send_keys(password)
@@ -112,46 +118,48 @@ def parse_start(id, pw, hashtag):
 def parsing(driver,url,pl):
     # 검색 결과 페이지 열기
     driver.get(url)
-    time.sleep(4)  # 코드 수행 시간
+    time.sleep(5)  # 코드 수행 시간
 
-    # 첫 번째 게시물 클릭
-    select_first(driver)
+    try:# 첫 번째 게시물 클릭
+        select_first(driver)
 
-    # 본격적으로 데이터 수집 시작
-    results = []
-    ## 수집할 게시물의 수
-    target = 50
+        # 본격적으로 데이터 수집 시작
+        results = []
+        ## 수집할 게시물의 수
+        target = 20
 
-    tmp_url = ''
-    for i in range(target):
-        now_url = driver.current_url
-        if now_url == tmp_url:
-            continue
-        else:
+        tmp_url = ''
+        for i in range(target):
+            now_url = driver.current_url
+            if now_url == tmp_url:
+                continue
+            else:
 
-            try:
-                data = get_content(driver)
-                spam = 'spam' # 필터링 된 경우 추가 안함
-                if data[2] != spam:
-                    results.append(data)
-                move_next(driver)
-            except:
-                time.sleep(2)
-                move_next(driver)
-        time.sleep(5)
-        tmp_url = now_url
-    try:
-        output_df = pd.DataFrame(results)
-        output_df.columns = ['이미지URL', '장소','본문','해시태그']
-        output_df.to_excel(pl+'_크롤링.xlsx')
-        print(pl+"->크롤링 완료")
+                try:
+                    data = get_content(driver)
+                    spam = 'spam' # 필터링 된 경우 추가 안함
+                    if data[2] != spam:
+                        results.append(data)
+                    move_next(driver)
+                except:
+                    time.sleep(2)
+                    move_next(driver)
+            time.sleep(5)
+            tmp_url = now_url
+        try:
+            output_df = pd.DataFrame(results)
+            output_df.columns = ['이미지URL', '장소','본문','해시태그']
+            output_df.to_excel(pl+'_크롤링.xlsx')
+            print(pl+"->크롤링 완료")
+        except:
+            print("저장된 내용 없음")
     except:
-        print("저장된 내용 없음")
+        pass
 
 
 # 인스타그램 아이디, 비번, 해시태그 입력하는곳
-id = ""
-pw = ""
+id = "woongez@Naver.com"
+pw = "woong339312!"
 hashtag="가볼만한곳"
 
 parse_start(id,pw,hashtag)
