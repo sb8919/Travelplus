@@ -3,14 +3,15 @@ from pandas import Series, DataFrame
 import numpy as np
 from skimage import io
 import matplotlib.pyplot as plt
-import tkinter
 from IPython.display import clear_output
-from tkinter import messagebox
+from tkinter import filedialog
 
-# 데이터 파일 이름
-file_name = '강북_크롤링'
+import easygui
 
-df = pd.read_excel(file_name+'.xlsx', engine = "openpyxl")
+data_file_path = easygui.fileopenbox()
+file_name = data_file_path
+
+df = pd.read_excel(file_name, engine = "openpyxl")
 arr = np.array(df)
 test_list = np.delete(arr, 0, axis = 1)
 #test_list = [['장소','본문','태그','img_url'],['장소2','본문2','태그2','img_url2'],['장소3','본문3','태그3','img_url3'],] #입력리스트 ex) 엑셀 데이터
@@ -44,7 +45,7 @@ def labeling(url,place,main,tags):
             sel_list.insert(0,c)
 
         label_output.append(sel_list)
-    
+list_count = 1
 for i in range(list_count):
     clear_output(wait=True) # 창 초기화
     print('------------------------------[ '+str(i+1)+'번째 게시글 ]------------------------------')
@@ -53,4 +54,5 @@ for i in range(list_count):
 label_df = pd.DataFrame(label_output)
 label_df.columns = ['장소','본문','태그','1.가볼만한곳','2.가족여행', '3.우정여행', '4.전통','5.체험', '6.캠핑','7.관람','8.맛집', '9.카페']
 finsih_alram()
+file_name='file_name'
 label_df.to_excel('라벨링완료_'+file_name+'.xlsx')
