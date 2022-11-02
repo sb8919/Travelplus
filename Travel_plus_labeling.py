@@ -22,53 +22,64 @@ test_list = np.delete(arr, 0, axis = 1)
 label_output = [] #출력리스트
 theme = 9 #테마 개수(스팸 포함)
 
-list_count = len(test_list) # 리스트 개수
+list_count = len(test_list) # Count List
 
-def finsih_alram():
+def finsih_alram(): # notice over
     print('----------------------------------------------------\n\n\t\t\t라벨링완료\n\n----------------------------------------------------')
-    # tkinter.messagebox.showinfo('라벨링완료', '라벨링이완료되었습니다.')
+
+def get_df(sel,tags,main,place): # append label_output(tuple)
+            
+    sel_list = ['1' if l+1 == int(sel) else '0' for l in range(theme)]   
+        
+    content_output_list = [tags,main,place] # list to add to Excel
     
+    for c in content_output_list: # List insert
+        sel_list.insert(0,c) 
+
+    label_output.append(sel_list) # make tuple ex) ['장소','본문','태그',0,1,0,0,0,0,0,0]
+
+def mkdf(): # make DataFrame
+    label_df = pd.DataFrame(label_output)
+    label_df = pd.DataFrame(label_df)
+    label_df.columns = ['장소','본문','태그','1.가볼만한곳','2.가족여행', '3.우정여행', '4.전통','5.체험', '6.캠핑','7.관람','8.맛집', '9.카페']
+    return label_df       
+
 def labeling(url,place,main,tags):
+    # URL Error exception handling
     try:
         image = io.imread(url)
         plt.imshow(image)
         plt.show()
     except:
         print('이미지출력 : 안됨')
+        
     print('장소 : '+ place)
     print('본문 : '+ main)
     print('태그 : '+ tags)   
-    sel = input("\n라벨링 해주세요 1.가볼만한곳 2.가족여행 3.우정여행 4.전통 5.체험 6.캠핑 7.관람 8.맛집 9.카페 0.스팸 [일시중지] \n")
-    if sel == '0':# 스팸일때 게시물 Pass
-        return
-
-    else:
-        
-        sel_list = ['1' if l+1 == sel else '0' for l in range(theme)]   
-        
-        content_output_list = [tags,main,place] # 엑셀에 추가할 목록
+    sel = input("\n라벨링 해주세요 1.가볼만한곳 2.가족여행 3.우정여행 4.전통 5.체험 6.캠핑 7.관람 8.맛집 9.카페 0.스팸 [일시중지하기 : s] \n")
     
-        for c in content_output_list: # List insert
-            sel_list.insert(0,c)
-
-        label_output.append(sel_list)
-        label_df = pd.DataFrame(label_output)
-        label_df.columns = ['장소','본문','태그','1.가볼만한곳','2.가족여행', '3.우정여행', '4.전통','5.체험', '6.캠핑','7.관람','8.맛집', '9.카페']
-        if sel == "일시중지":
-            label_df.to_excel('라벨링tmp_'+file_name+'.xlsx')
-            tmp = pd.read_excel('라벨링tmp_'+file_name+'.xlsx')
-            tmp_arr = np.array(tmp)
-            tmp_value = np.delete(tmp_arr, 0, axis = 1)
-            save_index = tmp_value[-1]
+    if sel == '0':# Pass when spam
+        return
+    else:
+        if sel == "s": # Stop
+            return sel
         else:
-            label_df.to_excel('라벨링완료_'+file_name+'.xlsx')
-        
-        
+            get_df(sel,tags,main,place)
+
 save_index=0       
 list_count = 5
+
 for i in range(save_index, list_count):
-    clear_output(wait=True) # 창 초기화
+    clear_output(wait=True) # Clear cell
     print('------------------------------[ '+str(i+1)+'번째 게시글 ]------------------------------')
-    labeling(str(test_list[i][0]),str(test_list[i][1]),str(test_list[i][2]),str(test_list[i][3]))
-    
+    sel = labeling(str(test_list[i][0]),str(test_list[i][1]),str(test_list[i][2]),str(test_list[i][3]))
+    if sel == 's':
+        break
+        
+if sel =='s':
+    label_df = mkdf()
+    label_df.to_excel('라벨링tmp_'+file_name+'.xlsx')
+else:
+    label_df = mkdf()
+    label_df.to_excel('라벨링완료_'+file_name+'.xlsx')
 finsih_alram()
