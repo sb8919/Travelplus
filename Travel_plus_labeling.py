@@ -75,11 +75,10 @@ for i in range(save_index, list_count):
     sel = labeling(str(test_list[i][0]),str(test_list[i][1]),str(test_list[i][2]),str(test_list[i][3]))
     if sel == 's':
         break
-        
+
+label_df = mkdf()        
 if sel =='s':
-    label_df = mkdf()
     label_df.to_excel('라벨링tmp_'+file_name+'.xlsx')
 else:
-    label_df = mkdf()
     label_df.to_excel('라벨링완료_'+file_name+'.xlsx')
 finsih_alram()
