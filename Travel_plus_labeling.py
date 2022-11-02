@@ -44,7 +44,7 @@ def mkdf(): # make DataFrame
     label_df.columns = ['장소','본문','태그','1.가볼만한곳','2.가족여행', '3.우정여행', '4.전통','5.체험', '6.캠핑','7.관람','8.맛집', '9.카페']
     return label_df       
 
-def labeling(url,place,main,tags):
+def labeling(url,place,main,tags): #Labeling
     # URL Error exception handling
     try:
         image = io.imread(url)
