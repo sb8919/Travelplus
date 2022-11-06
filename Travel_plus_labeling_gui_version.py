@@ -130,12 +130,10 @@ def open_file():
         else:
             st = int(st-1) 
             count = 0
-            # for d in df_list:
-            #     count +=1
-            #     if count != len(df_list):
-            #         label_output.append(d)
-                    
-            df = pd.read_excel(file_name.split('_')[1]+'_크롤링.xlsx', engine = "openpyxl")
+            try:
+                df = pd.read_excel(file_name.split('_')[1]+'_크롤링.xlsx', engine = "openpyxl")
+            except:
+                tk.messagebox.showerror('파일오류', 'Error: 원본파일과 tmp파일의 위치를 같게 해주세요!')
             df_len=int(df.iloc[-1][0])
             arr = np.array(df)
             df_list = np.delete(arr, 0, axis = 1)
