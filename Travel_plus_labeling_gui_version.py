@@ -76,8 +76,6 @@ def KeyClick(labeling_win,file_name,data_file_path,process_label,photo_label,pla
                     tmp_alaram()
                     labeling_win.destroy()
                     return
-                elif keyboard.is_pressed('0'):
-                    continue
                 elif keyboard.is_pressed(k):
                     get_df(k,tags,main,place)
                     continue
