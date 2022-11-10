@@ -11,6 +11,7 @@ from io import BytesIO
 import time
 import keyboard
 import os
+import shutil
 
 key = 0
 
@@ -124,6 +125,7 @@ def open_file():
         global st  
         st = len(df)
         if "tmp" not in file_name:
+            shutil.copy(data_file_path,os.getcwd()+"/"+file_name+".xlsx")
             st = 0
         else:
             st = int(st-1) 
@@ -136,6 +138,7 @@ def open_file():
             arr = np.array(df)
             df_list = np.delete(arr, 0, axis = 1)
         start_position(st)
+        
         return file_name,df,df_len,df_list,data_file_path
     except:
         not_selecting_alarm()

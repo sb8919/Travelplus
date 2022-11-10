@@ -9,6 +9,7 @@ number = 4 #나눌 사람 수
 
 divide = int(len(file_list)/number)
 for i in range(4):
+    df_list = pd.DataFrame()
     d += divide
     for f in file_list[c:d]:
         df = pd.read_excel('data/'+f,usecols=[1,2,3,4]) #파일 각 불러오기
@@ -35,6 +36,6 @@ for i in range(4):
     out_df =pd.DataFrame(out_df) # 최종출력 데이터프레임 생성
     out_df = out_df.dropna() # 값이 없는 값 삭제
     out_df.columns = ['이미지URL','장소','본문','해시태그']
-    out_df.to_excel('Merge_Crolling_'+str(i)+'.xlsx')
+    out_df.to_excel('MergeCrolling['+str(i)+']_크롤링.xlsx')
     c += divide
     
