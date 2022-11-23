@@ -135,6 +135,7 @@ def open_file():
             except:
                 tk.messagebox.showerror('파일오류', 'Error: 원본파일과 tmp파일의 위치를 같게 해주세요!')
             df_len=int(df.iloc[-1][0])
+            len(df_list)
             arr = np.array(df)
             df_list = np.delete(arr, 0, axis = 1)
         start_position(st)
