@@ -1,6 +1,24 @@
+@font-face {
+    font-family: 'PuradakGentleGothicR';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_11-01@1.1/PuradakGentleGothicR.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'ChosunGs';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-04@1.0/ChosunGs.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'GmarketSansMedium';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
 .wrap {
     position: absolute;
-    min-width: 1200px;
+    min-width: 100%;
     width: 100%;
     height: 100%;
     display: flex;
@@ -10,7 +28,7 @@
 .header {
   display: flex;
   font-size: 1.4em;
-  background-color: #f8b550;
+  background-color: #3590F3;
   color: white;
   box-shadow: 0 2px 2px 0 rgba(0,0,0,0.1);
   
@@ -22,13 +40,13 @@
     padding-left: 50px;
     box-shadow: 0 2px 2px 0 rgba(0,0,0,0.1);
     background-color: white;
-    font-family: 'Jua', sans-serif;
+    font-family: 'GmarketSansMedium';
 }
 
 .filter_box {
     flex: 0 1 auto;
     max-width: 300px;
-    overflow:hidden;
+    overflow: visible;
     text-overflow: ellipsis;
     white-space: nowrap;
     height: 38px;
@@ -45,8 +63,8 @@
 
 .logo, .gnb {
     padding: 20px 40px;
-    background-color: #f09f25;
-    font-family: 'Jua', sans-serif;
+    background-color: #1d74d1;
+    font-family: 'GmarketSansMedium';
     
 
     
@@ -65,12 +83,12 @@
 .search_button {
     width: 50px;
     height: 37px;
-    background-color: #e79821;
+    background-color: #1d74d1;
     border-top-left-radius: 0.5em;
     border-top-right-radius: 0.5em;
     border-bottom-left-radius: 0.5em;
     border-bottom-right-radius: 0.5em;
-    font-family: 'Jua', sans-serif;
+    font-family: 'GmarketSansMedium';
     color: white;
     box-shadow: 0 2px 2px 0 rgba(0,0,0,0.1);
     
@@ -87,13 +105,32 @@
     border-bottom-right-radius: 1em;
     box-shadow: 0 2px 2px 0 rgba(0,0,0,0.1);
 }
+.main_img_text h1{
+    position: absolute;
+    bottom: 23%;
+    left: 16%;
+    width: 100;
+    transform: translate( -50%, -50% );
+font-size: 120px;
+font-family: 'ChosunGs';
+color :white
+}
+.main_img_text h2{
+    position: absolute;
+    bottom: 10%;
+    left: 12%;
+    width: 100;
+    transform: translate( -50%, -50% );
+font-size: 120px;
+font-family: 'ChosunGs';
+color :white
+}
 .tablist{
-    display:flex;
-    justify-content:space-between;
-    flex:0 0 40px;
-    border:1px solid rgba(0,0,0,0.12);
-    box-shadow: 0 2px 2px 0 rgba(0,0,0,0.1);
-    background:#fff;
+    background-color: white;
+    font-size: 20px;
+    text-align: center;
+    padding: 10px 0;
+    font-family: 'GmarketSansMedium';
 }
 .tab{
     position:relative;
@@ -102,14 +139,28 @@
     font-weight:bold;
     padding:0 15px;
 }
-.tab.selected:after{
-    position: absolute;
-    bottom: 9px;
-    left: 13px;
-    right: 13px;
-    height: 9px;
-    background:rgba(249, 253, 0, 0.514);
-    content: '';
+.progress {
+    font-family: 'GmarketSansMedium';
+    border-top-left-radius: 1em;
+    border-top-right-radius: 1em;
+    border-bottom-left-radius: 1em;
+    border-bottom-right-radius: 1em;
+    background-color: white;
+}
+#progress {
+    appearance: none;
+}
+#progress::-webkit-progress-bar {
+    background:#f0f0f0;
+    border-radius:10px;
+    box-shadow: inset 3px 3px 10px #ccc;
+}
+#progress::-webkit-progress-value {
+    border-radius:10px;
+    background: #1D976C;
+    background: -webkit-linear-gradient(to right, #99c9fc, #1d74d1);
+    background: linear-gradient(to right, #99c9fc, #1d74d1);
+
 }
 .map_wrap {
     display:flex;
@@ -122,17 +173,19 @@
     overflow: auto;
     position: relative;
 }
-.map h3{
+.photo_title{
+    background-color: white;
     font-size: 20px;
     text-align: center;
     padding: 10px 0;
-    margin-top: 10px;
-    font-family: 'Jua', sans-serif;
+    font-family: 'GmarketSansMedium';
+}
+.ui_box{
+    background-color: white;
 }
 .photo_container{
     width:100%;
     margin:30;
-    overflow:scroll;
 
 }
 .photo_list {
@@ -144,7 +197,7 @@
 .photo_list.column{
     align-content: flex-start;
     flex-direction: column;
-    height:650px;
+    height: 550px;
 }
 .photo_box {
     display: flex;
@@ -156,7 +209,7 @@
     border-top-right-radius: 1em;
     border-bottom-left-radius: 1em;
     border-bottom-right-radius: 1em;
-    background-color: white;
+    background-color: rgb(192, 229, 243);
     box-shadow: 0 2px 1px 0 rgba(0,0,0,0.1);
 }
 .photo {
@@ -167,20 +220,11 @@
     border-top-right-radius: 1em;
     border-bottom-left-radius: 1em;
     border-bottom-right-radius: 1em;
-    background-color: #f8b550;
+    background-color: #3590F3;
 }
 
 .description {
     flex: auto;
     text-align: center;
-    font-family: 'Jua', sans-serif;
-}
-.btn_refresh {
-    height: 38px;
-    margin: 15px 15px 0 auto;
-    padding: 9px 11px 8px;
-    border: 1px solid rgba(0,0,0,0.15);
-    background-color: white;
-    font-size: 17px;
-    box-shadow: 0 2px 2px 0 rgba(0,0,0,0.1);
+    font-family: 'GmarketSansMedium';
 }
