@@ -171,7 +171,7 @@ def KeyClick(labeling_win,file_name,data_file_path,process_label,photo_label,pla
                        
         
 def open_file():
-    label_output = []
+    label_output.clear()
     try:
         data_file_path = filedialog.askopenfilename(initialdir=os.getcwd(), title="Select file", filetypes=(("Excel File", "*.xlsx"),("all files", "*.*")))
         file_is =Path(data_file_path)
