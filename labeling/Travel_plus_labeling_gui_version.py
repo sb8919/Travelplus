@@ -83,7 +83,7 @@ def KeyClick(labeling_win,file_name,data_file_path,process_label,photo_label,pla
             if zero_working == False:
                 pass
             else:
-                get_df('스팸',tags,main,place)
+                get_df(['스팸'],tags,main,place)
                 i += 1
         else:
             for k in allow_list:
@@ -121,7 +121,7 @@ def KeyClick(labeling_win,file_name,data_file_path,process_label,photo_label,pla
             if zero_working == False:
                 pass
             else:
-                get_df('스팸',tags,main,place)
+                get_df(['스팸'],tags,main,place)
                 i += 1
         else:
             for k in allow_list:
