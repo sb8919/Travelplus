@@ -6,45 +6,51 @@ from tkinter import filedialog
 from PIL import Image, ImageTk
 import tkinter as tk
 import tkinter.font
+import urllib.request
 from urllib.request import Request, urlopen
+from urllib.error import URLError, HTTPError
 from io import BytesIO
 import time
 import keyboard
 import os
 import shutil
-
+import threading
 key = 0
-
 label_output = [] #출력리스트
 
 def finish_alram(): # notice over
-    tk.messagebox.showinfo('라벨링완료', '라벨링이 완료 되었습니다.')
-    
+    tk.messagebox.showinfo('라벨링완료', '라벨링이 완료 되었습니다.')    
 def tmp_alaram():
     tk.messagebox.showinfo('라벨링임시저장', '라벨링이 임시저장이 완료 되었습니다.')
-
 def not_selecting_alarm():
     tk.messagebox.showerror('선택오류', 'Error: 파일을 선택하지 않았습니다!')
-def get_df(sel,tags,main,place): # append label_output(tuple)
-    sel_list = [sel]   
+def get_df(sel,tags,main,place): # append label_output(tuple)  
+    global sel_columns
+    sel_list = [sel]
     content_output_list = [tags,main,place] # list to add to Excel
     
     for c in content_output_list: # List insert
         sel_list.insert(0,c) 
     
     label_output.append(sel_list) # make tuple ex) ['장소','본문','태그',4]
-
-def mkdf(): # make DataFrame
+    sel_columns = len(label_output)-2
+    return sel_columns
+def mkdf(): # make DataFrame    
     label_df = pd.DataFrame(label_output)
-    label_df.columns = ['장소','본문','태그','테마']
-    return label_df       
+    label_col1 = ['장소','본문','태그']
+    label_col2 = [i for i in range(1,sel_columns)]
+    df_columns = label_col1+label_col2
+    label_df.columns =  df_columns
+    return label_df
 
 def start_position(s):
     global i
     i = s
     
 def KeyClick(labeling_win,file_name,data_file_path,process_label,photo_label,place_label,content_label,tags_label,df_len,df,df_list):
-    allow_list=['0','1','2','3','4','5','6','7','8','9','s']
+    allow_list=['0','1','2','3','4','5','6','7','8','9','s','p']
+    sel_theme = []
+    not_pressed = True
     global i
     
     if i <= df_len:
@@ -66,7 +72,7 @@ def KeyClick(labeling_win,file_name,data_file_path,process_label,photo_label,pla
                 get_df(k,tags,main,place)
                 continue
         else:
-            if i < df_len:
+            if i < df_len:                                           
                 if keyboard.is_pressed('s'):
                     label_df = mkdf()
                     label_df.loc[len(label_df)]=[df_len,'','','']
@@ -76,10 +82,23 @@ def KeyClick(labeling_win,file_name,data_file_path,process_label,photo_label,pla
                         label_df.to_excel('라벨링tmp_'+file_name+'.xlsx')
                     tmp_alaram()
                     labeling_win.destroy()
-                    return
-                elif keyboard.is_pressed(k):
-                    get_df(k,tags,main,place)
-                    continue
+                    return    
+                
+                elif  keyboard.is_pressed(k):
+                    sel_theme.append(k)
+                    key = keyboard.read_key(suppress = True)  #키보드로 입력한 키들을 읽어옴
+                    if key : 
+                        if not_pressed: # keyboard.read_key가 키를 눌렀을떼와 뗄때 둘다 값을 가져오므로 이것을 
+                                            #해결하기 위한 것이므로 딱히 신경 안써도 됨
+                            sel_theme.append(key) #sel_theme 리스트에 읽어온 키들을 넣음
+                            if key == "p":       #만약 p 를 누르면
+                                sel_theme.pop(len(sel_theme)-1)  # ex) sel_theme = [2,1,p] 이렇게 되있으므로 p를 제거
+                                get_df(sel_theme,tags,main,place)
+                                continue
+                            not_pressed = False
+                        else:
+                            not_pressed = True    
+                                
     i += 1
     #출력 부분(다음내용 업데이트)
     if i <= df_len:
@@ -87,23 +106,32 @@ def KeyClick(labeling_win,file_name,data_file_path,process_label,photo_label,pla
         place = df_list[i][1]
         main = df_list[i][2]
         tags = df_list[i][3]
-        u = urlopen(URL)
-        raw_data = u.read()
-        u.close()
-        process_label.config(text='--------------------- 진행상황 '+str(i)+'/'+str(df_len)+' ---------------------')
-        img2 = ImageTk.PhotoImage(Image.open(BytesIO(raw_data)).resize((500, 500), Image.ANTIALIAS))
-        photo_label.config(image=img2)
-        photo_label.image = img2
-        place_label.config(text="장소 :"+str(place))    
-        content_label.config(text="본문 :"+str(main))    
-        tags_label.config(text="태그 :"+str(tags)) 
+        try:
+            global u
+            global raw_data
+            headers = {'User-Agent':'Chrome/66.0.3359.181'}
+            req = urllib.request.Request(URL, headers=headers)
+            u = urllib.request.urlopen(req)
+            raw_data = u.read()
+            u.close()
+            process_label.config(text='--------------------- 진행상황 '+str(i)+'/'+str(df_len)+' ---------------------')
+            img2 = ImageTk.PhotoImage(Image.open(BytesIO(raw_data)).resize((500, 500), Image.ANTIALIAS))
+            photo_label.config(image=img2)
+            photo_label.image = img2
+            place_label.config(text="장소 :"+str(place))    
+            content_label.config(text="본문 :"+str(main))    
+            tags_label.config(text="태그 :"+str(tags)) 
+        except HTTPError as e:
+            err = e.read()
+            code = e.getcode()
 
+        
     else:
         URL=df_list[df_len][0]
         place = df_list[df_len][1]
         main = df_list[df_len][2]
         tags = df_list[df_len][3]
-        get_df(k,tags,main,place)
+        get_df(sel_theme,tags,main,place)
         label_df = mkdf()
         if st > 0:
             os.remove(data_file_path)
@@ -113,7 +141,6 @@ def KeyClick(labeling_win,file_name,data_file_path,process_label,photo_label,pla
         finish_alram()
         
         labeling_win.destroy()
-
 def open_file():
     try:
         data_file_path = filedialog.askopenfilename(initialdir=os.getcwd(), title="Select file", filetypes=(("Excel File", "*.xlsx"),("all files", "*.*")))
@@ -146,6 +173,7 @@ def open_file():
 def update_process(i,process_label,df_len):
     process_label.config(text='--------------------- 진행상황 '+str(i)+'/'+str(df_len)+' ---------------------')
 def start_labeling():
+    
     try:
         file_name,df,df_len,df_list,data_file_path = open_file()
     except:
@@ -157,20 +185,28 @@ def start_labeling():
     place = df_list[st][1]
     main = df_list[st][2]
     tags = df_list[st][3]
-
-    u = urlopen(URL)
-    raw_data = u.read()
-    u.close()
-
-    im = Image.open(BytesIO(raw_data))
-    im = im.resize((500, 500), Image.ANTIALIAS)
-    photo = ImageTk.PhotoImage(im)
-
+    
+    try:
+        global u
+        global raw_data
+        headers = {'User-Agent':'Chrome/66.0.3359.181'}
+        req = urllib.request.Request(URL, headers=headers)
+        u = urllib.request.urlopen(req)
+        raw_data = u.read()
+        u.close()
+        im = Image.open(BytesIO(raw_data))
+        im = im.resize((500, 500), Image.ANTIALIAS)
+        photo = ImageTk.PhotoImage(im)
+    except HTTPError as e:
+        err = e.read()
+        code = e.getcode()
+        
+    
     try:
         photo_label = tk.Label(labeling_win,image=photo,width=500,height=500)
         photo_label.image = photo
     except:
-        photo_label = tk.Label(text='사진없음')
+        photo_label = tk.Label(labeling_win,text='사진없음')
     process_label = tk.Label(labeling_win, text='--------------------- 진행상황 0/'+str(df_len)+' ---------------------')
     process_label.grid(column = 0, row= 0, pady = (15,0), sticky='wes')
     update_process(i,process_label,df_len)
@@ -181,13 +217,14 @@ def start_labeling():
     content_label.grid(column=0,row=3,sticky='w')
     tags_label= tk.Label(labeling_win,text="태그: "+str(tags),wraplength = 550, fg='RoyalBlue3')
     tags_label.grid(column=0,row=4,sticky='w')
-    guide_text1= tk.Label(labeling_win,text="키보로 입력해주세요😁")
+    guide_text1= tk.Label(labeling_win,text="키보드로 입력해주세요😁")
     guide_text1.grid(column=0,row=5)
     guide_text= tk.Label(labeling_win,text="1.가볼만한곳 2.가족여행 3.우정여행 4.전통 5.체험 6.캠핑 7.관람 8.맛집 9.카페 0.스팸 [일시중지하기 : s]")
     guide_text.grid(column=0,row=6)
     labeling_win.bind("<Key>",lambda event: KeyClick(labeling_win,file_name,data_file_path,process_label,photo_label,place_label,content_label,tags_label,df_len,df,df_list))
     
 #view_load_button
+
 def load_file():
     try:
         filename = filedialog.askopenfilename(initialdir=os.getcwd(), title="Select file", filetypes=(("Excel File", "*.xlsx"),("all files", "*.*")))
@@ -200,7 +237,6 @@ def load_file():
             tmp_value = np.delete(tmp_arr, 0, axis = 1)
             label_check = len(tmp_value)-1
             label_max = tmp.iloc[-1][1]
-
             filename= filename.split('/')[-1].split('.')[0]
             view_content.configure(text=filename+'의 진행상황은')
             bar_index = label_check/label_max * 100
@@ -209,7 +245,6 @@ def load_file():
         view_percent.configure(text=per+'%')
     except FileNotFoundError:
         not_selecting_alarm()
-
 def now_dir():
     dir = os.getcwd()
     os.startfile(dir)
@@ -217,34 +252,26 @@ def now_dir():
 win = Tk()
 win.geometry("400x200+500+400")
 win.title("Labeling Program")
-
 #Font style
 title=tk.font.Font(family="맑은 고딕", size=18, weight='bold')
 content=tk.font.Font(family="맑은 고딕", size=10)
 percent=tk.font.Font(family="맑은 고딕", size=20)
 load_font=tk.font.Font(family="맑은 고딕", size=10, weight='bold')
-
 #win style
 win.configure(bg='gray5')
 win.columnconfigure(0,weight=1)
 win.rowconfigure(0,weight=1)
-
 #main_Frame(view_status_Frame, work_labeling_Frame)
 main_Frame = Frame(win, bg = 'gray15')
 main_Frame.grid(row = 0, column = 0 ,  sticky='WESN')
-
 #main_Frame style
 main_Frame.columnconfigure(0,weight=3)
 main_Frame.columnconfigure(1,weight=1)
 main_Frame.rowconfigure(0,weight=1)
-
 #view_status_Frame
 view_status_Frame = Frame(main_Frame, bg='gray22')
 view_status_Frame.grid(row=0, column=0, padx =10 , pady = 10 , ipadx=20, ipady=10, sticky='WESN')
-
-
 #view_status_Frame_function
-
 view_title = Label(view_status_Frame, text="STATUS", bg='gray22', fg='white', font= title)
 view_title.grid(row=0, column=0, sticky='w',padx=10)
 # view_load_btn= Button(view_status_Frame,text="Load File", bg='gray40',fg='white', font = load_font ,command= load_file)
@@ -262,28 +289,19 @@ s.configure("black.Horizontal.TProgressbar",troughcolor ='gray40', background='d
 bar = ttk.Progressbar(view_status_Frame, length=200, s='black.Horizontal.TProgressbar')
 bar['value'] = 1
 bar.grid(row=4, column=0, pady=10, padx= (12,0), sticky='w')
-
 #work_labeling_Frame
 work_labeling_Frame = Frame(main_Frame, bg='gray22')
 work_labeling_Frame.grid(row=0, column = 1, padx =(0,10) , pady = 10 , ipadx=10, ipady=10, sticky='WESN')
-
 #work_labeling_Frame style
 work_labeling_Frame.columnconfigure(0,weight=1)
-
 #work_labeing_Frame_function
 button_font=tk.font.Font(family="맑은 고딕", size=10, weight='bold')
-
 new_btn = Button(work_labeling_Frame,text=" Sel File",bg='gray28',fg='white', font = button_font, command=start_labeling)
 new_btn.grid(row=0,column=0 ,pady=8,sticky='we')
-
-
 load_btn = Button(work_labeling_Frame,text=" File Status", bg='gray28',fg='white', font = button_font ,command=load_file)
 load_btn.grid(row=2,column=0 ,pady=8,ipadx=5,sticky='we')
-
-
 open_btn = Button(work_labeling_Frame,text=" Open Dir", bg='gray28',fg='white', font = button_font, command = now_dir )
 open_btn.grid(row=3,column=0 ,pady=8,ipadx=5,sticky='we')
-
 #Icon Setting
 try:
     new_file = PhotoImage(file='add.png')
@@ -303,6 +321,7 @@ try:
     
 except TclError:
     print("아이콘 존재하지않음")
-    
-    
+
+
+win.mainloop()
 win.mainloop()
