@@ -20,6 +20,7 @@ from pathlib import Path
 key = 0
 label_output = [] #출력리스트
 sel_theme = []
+theme_conv = ['가볼만한곳','가족여행','우정여행','전통','체험','캠핑','관람','맛집','카페']
 
 def finish_alram(): # notice over
     tk.messagebox.showinfo('라벨링완료', '라벨링이 완료 되었습니다.')    
@@ -33,7 +34,6 @@ def not_selecting_alarm():
 def get_df(sel,tags,main,place): # append label_output(tuple)  
     global sel_columns
     sel_list = [sel]
-    print(sel_list)
     content_output_list = [tags,main,place] # list to add to Excel
     
     for c in content_output_list: # List insert
@@ -43,7 +43,7 @@ def get_df(sel,tags,main,place): # append label_output(tuple)
     sel_columns = len(label_output)-2
     return sel_columns
 
-def mkdf(): # make DataFrame    
+def mkdf(): # make DataFrame   
     label_df = pd.DataFrame(label_output)
     label_col1 = ['장소','본문','태그']
     return label_df
@@ -53,10 +53,10 @@ def start_position(s):
     i = s
     
 def KeyClick(labeling_win,file_name,data_file_path,process_label,photo_label,place_label,content_label,tags_label,df_len,df,df_list):
-    allow_list=['0','1','2','3','4','5','6','7','8','9']
+    allow_list=['1','2','3','4','5','6','7','8','9']
     global sel_theme
     global i
-    print(i)
+    zero_working = True
     was_pressed = False
     
     URL=df_list[i][0]
@@ -79,14 +79,23 @@ def KeyClick(labeling_win,file_name,data_file_path,process_label,photo_label,pla
                 was_pressed = True
             else:
                 was_pressed = False
+        elif keyboard.is_pressed('0'):
+            if zero_working == False:
+                pass
+            else:
+                get_df('스팸',tags,main,place)
+                i += 1
         else:
             for k in allow_list:
                 if keyboard.is_pressed(k):
                     if not was_pressed:
-                        sel_theme.append(k)
+                        th = theme_conv[int(k)+1]
+                        sel_theme.append(th)
                         was_pressed = True
+                        zero_working = False
                     else:
                         was_pressed = False
+                    
 
     else:
         if keyboard.is_pressed('s'):
@@ -108,11 +117,18 @@ def KeyClick(labeling_win,file_name,data_file_path,process_label,photo_label,pla
                 was_pressed = True
             else:
                 was_pressed = False
+        elif keyboard.is_pressed('0'):
+            if zero_working == False:
+                pass
+            else:
+                get_df('스팸',tags,main,place)
+                i += 1
         else:
             for k in allow_list:
                 if  keyboard.is_pressed(k):
                     if not was_pressed:
-                        sel_theme.append(k)
+                        th = theme_conv[int(k)+1]
+                        sel_theme.append(th)
                         was_pressed = True
                     else:
                         was_pressed = False
@@ -155,6 +171,7 @@ def KeyClick(labeling_win,file_name,data_file_path,process_label,photo_label,pla
                        
         
 def open_file():
+    label_output = []
     try:
         data_file_path = filedialog.askopenfilename(initialdir=os.getcwd(), title="Select file", filetypes=(("Excel File", "*.xlsx"),("all files", "*.*")))
         file_is =Path(data_file_path)
