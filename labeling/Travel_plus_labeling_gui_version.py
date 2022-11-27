@@ -15,18 +15,25 @@ import keyboard
 import os
 import shutil
 import threading
+from pathlib import Path
+
 key = 0
 label_output = [] #출력리스트
+sel_theme = []
 
 def finish_alram(): # notice over
     tk.messagebox.showinfo('라벨링완료', '라벨링이 완료 되었습니다.')    
+    
 def tmp_alaram():
     tk.messagebox.showinfo('라벨링임시저장', '라벨링이 임시저장이 완료 되었습니다.')
+    
 def not_selecting_alarm():
     tk.messagebox.showerror('선택오류', 'Error: 파일을 선택하지 않았습니다!')
+    
 def get_df(sel,tags,main,place): # append label_output(tuple)  
     global sel_columns
     sel_list = [sel]
+    print(sel_list)
     content_output_list = [tags,main,place] # list to add to Excel
     
     for c in content_output_list: # List insert
@@ -35,12 +42,10 @@ def get_df(sel,tags,main,place): # append label_output(tuple)
     label_output.append(sel_list) # make tuple ex) ['장소','본문','태그',4]
     sel_columns = len(label_output)-2
     return sel_columns
+
 def mkdf(): # make DataFrame    
     label_df = pd.DataFrame(label_output)
     label_col1 = ['장소','본문','태그']
-    label_col2 = [i for i in range(1,sel_columns)]
-    df_columns = label_col1+label_col2
-    label_df.columns =  df_columns
     return label_df
 
 def start_position(s):
@@ -48,67 +53,79 @@ def start_position(s):
     i = s
     
 def KeyClick(labeling_win,file_name,data_file_path,process_label,photo_label,place_label,content_label,tags_label,df_len,df,df_list):
-    allow_list=['0','1','2','3','4','5','6','7','8','9','s','p']
-    sel_theme = []
-    not_pressed = True
+    allow_list=['0','1','2','3','4','5','6','7','8','9']
+    global sel_theme
     global i
+    print(i)
+    was_pressed = False
     
-    if i <= df_len:
-        URL=df_list[i][0]
-        place = df_list[i][1]
-        main = df_list[i][2]
-        tags = df_list[i][3]
-    for k in allow_list:
-        if i == 0:
-            if keyboard.is_pressed('s'):
-                tk.messagebox.showinfo('라벨링임시저장', '첫번째 게시물은 저장할 수 없습니다.')
-                continue
-            elif keyboard.is_pressed('0'):
-                continue
-            elif keyboard.is_pressed(k):
-                place = df_list[0][1]
-                main = df_list[0][2]
-                tags = df_list[0][3]
-                get_df(k,tags,main,place)
-                continue
+    URL=df_list[i][0]
+    place = df_list[i][1]
+    main = df_list[i][2]
+    tags = df_list[i][3]
+    if i == 0:
+        URL=df_list[0][0]
+        place = df_list[0][1]
+        main = df_list[0][2]
+        tags = df_list[0][3]
+        if keyboard.is_pressed('s'):
+            tk.messagebox.showinfo('라벨링임시저장', '첫번째 게시물은 저장할 수 없습니다.')
+
+        elif keyboard.is_pressed('p'):
+            if not was_pressed:
+                get_df(sel_theme,tags,main,place)
+                sel_theme = [] 
+                i += 1
+                was_pressed = True
+            else:
+                was_pressed = False
         else:
-            if i < df_len:                                           
-                if keyboard.is_pressed('s'):
-                    label_df = mkdf()
-                    label_df.loc[len(label_df)]=[df_len,'','','']
-                    if st>0:
-                        label_df.to_excel('라벨링tmp_'+file_name.split('_')[1]+'_크롤링.xlsx')
+            for k in allow_list:
+                if keyboard.is_pressed(k):
+                    if not was_pressed:
+                        sel_theme.append(k)
+                        was_pressed = True
                     else:
-                        label_df.to_excel('라벨링tmp_'+file_name+'.xlsx')
-                    tmp_alaram()
-                    labeling_win.destroy()
-                    return    
-                
-                elif  keyboard.is_pressed(k):
-                    sel_theme.append(k)
-                    key = keyboard.read_key(suppress = True)  #키보드로 입력한 키들을 읽어옴
-                    if key : 
-                        if not_pressed: # keyboard.read_key가 키를 눌렀을떼와 뗄때 둘다 값을 가져오므로 이것을 
-                                            #해결하기 위한 것이므로 딱히 신경 안써도 됨
-                            sel_theme.append(key) #sel_theme 리스트에 읽어온 키들을 넣음
-                            if key == "p":       #만약 p 를 누르면
-                                sel_theme.pop(len(sel_theme)-1)  # ex) sel_theme = [2,1,p] 이렇게 되있으므로 p를 제거
-                                get_df(sel_theme,tags,main,place)
-                                continue
-                            not_pressed = False
-                        else:
-                            not_pressed = True    
-                                
-    i += 1
+                        was_pressed = False
+
+    else:
+        if keyboard.is_pressed('s'):
+            label_df = mkdf()
+            label_df.loc[len(label_df)]=[df_len,'','','']
+            if st>0:
+                label_df.to_excel('라벨링tmp_'+file_name.split('_')[1]+'_크롤링.xlsx')
+            else:
+                label_df.to_excel('라벨링tmp_'+file_name+'.xlsx')
+            tmp_alaram()
+            labeling_win.destroy()
+            return    
+
+        elif keyboard.is_pressed('p'):
+            if not was_pressed:
+                get_df(sel_theme,tags,main,place)
+                sel_theme = [] 
+                i += 1
+                was_pressed = True
+            else:
+                was_pressed = False
+        else:
+            for k in allow_list:
+                if  keyboard.is_pressed(k):
+                    if not was_pressed:
+                        sel_theme.append(k)
+                        was_pressed = True
+                    else:
+                        was_pressed = False
+
     #출력 부분(다음내용 업데이트)
-    if i <= df_len:
-        URL=df_list[i][0]
-        place = df_list[i][1]
-        main = df_list[i][2]
-        tags = df_list[i][3]
+    if i <= df_len: 
         try:
             global u
             global raw_data
+            URL=df_list[i][0]
+            place = df_list[i][1]
+            main = df_list[i][2]
+            tags = df_list[i][3]
             headers = {'User-Agent':'Chrome/66.0.3359.181'}
             req = urllib.request.Request(URL, headers=headers)
             u = urllib.request.urlopen(req)
@@ -124,14 +141,7 @@ def KeyClick(labeling_win,file_name,data_file_path,process_label,photo_label,pla
         except HTTPError as e:
             err = e.read()
             code = e.getcode()
-
-        
     else:
-        URL=df_list[df_len][0]
-        place = df_list[df_len][1]
-        main = df_list[df_len][2]
-        tags = df_list[df_len][3]
-        get_df(sel_theme,tags,main,place)
         label_df = mkdf()
         if st > 0:
             os.remove(data_file_path)
@@ -139,11 +149,15 @@ def KeyClick(labeling_win,file_name,data_file_path,process_label,photo_label,pla
         else:
             label_df.to_excel('라벨링완료_'+file_name+'.xlsx')
         finish_alram()
-        
+
         labeling_win.destroy()
+
+                       
+        
 def open_file():
     try:
         data_file_path = filedialog.askopenfilename(initialdir=os.getcwd(), title="Select file", filetypes=(("Excel File", "*.xlsx"),("all files", "*.*")))
+        file_is =Path(data_file_path)
         file_name = data_file_path.split('/')[-1].split('.')[0]
         df = pd.read_excel(data_file_path, engine = "openpyxl")
         df_len=int(df.iloc[-1][0])
@@ -152,31 +166,34 @@ def open_file():
         global st  
         st = len(df)
         if "tmp" not in file_name:
-            shutil.copy(data_file_path,os.getcwd()+"/"+file_name+".xlsx")
+            if (file_is.is_file()):
+                pass
+            else:
+                shutil.copy(data_file_path,os.getcwd()+"/"+file_name+".xlsx")
             st = 0
         else:
             st = int(st-1) 
             count = 0
             try:
                 df = pd.read_excel(file_name.split('_')[1]+'_크롤링.xlsx', engine = "openpyxl")
-            except:
+            except FileNotFoundError:
                 tk.messagebox.showerror('파일오류', 'Error: 원본파일과 tmp파일의 위치를 같게 해주세요!')
             df_len=int(df.iloc[-1][0])
             len(df_list)
             arr = np.array(df)
             df_list = np.delete(arr, 0, axis = 1)
         start_position(st)
-        
         return file_name,df,df_len,df_list,data_file_path
-    except:
+    except FileNotFoundError:
         not_selecting_alarm()
+        
 def update_process(i,process_label,df_len):
     process_label.config(text='--------------------- 진행상황 '+str(i)+'/'+str(df_len)+' ---------------------')
-def start_labeling():
     
+def start_labeling():
     try:
         file_name,df,df_len,df_list,data_file_path = open_file()
-    except:
+    except TypeError:
         return
     labeling_win = Toplevel()
     labeling_win.resizable("FALSE","TRUE")
@@ -205,8 +222,9 @@ def start_labeling():
     try:
         photo_label = tk.Label(labeling_win,image=photo,width=500,height=500)
         photo_label.image = photo
-    except:
-        photo_label = tk.Label(labeling_win,text='사진없음')
+    except UnboundLocalError:
+        photo_label = tk.Label(labeling_win,text='사진없음',height=25)
+        
     process_label = tk.Label(labeling_win, text='--------------------- 진행상황 0/'+str(df_len)+' ---------------------')
     process_label.grid(column = 0, row= 0, pady = (15,0), sticky='wes')
     update_process(i,process_label,df_len)
@@ -223,8 +241,7 @@ def start_labeling():
     guide_text.grid(column=0,row=6)
     labeling_win.bind("<Key>",lambda event: KeyClick(labeling_win,file_name,data_file_path,process_label,photo_label,place_label,content_label,tags_label,df_len,df,df_list))
     
-#view_load_button
-
+#File_status
 def load_file():
     try:
         filename = filedialog.askopenfilename(initialdir=os.getcwd(), title="Select file", filetypes=(("Excel File", "*.xlsx"),("all files", "*.*")))
@@ -237,14 +254,18 @@ def load_file():
             tmp_value = np.delete(tmp_arr, 0, axis = 1)
             label_check = len(tmp_value)-1
             label_max = tmp.iloc[-1][1]
-            filename= filename.split('/')[-1].split('.')[0]
-            view_content.configure(text=filename+'의 진행상황은')
-            bar_index = label_check/label_max * 100
+            if type(label_check) is str or type(label_max) is str:
+                bar_index = 0
+            else:
+                filename= filename.split('/')[-1].split('.')[0]
+                view_content.configure(text=filename+'의 진행상황은')
+                bar_index = label_check/label_max * 100
             per = str(int(bar_index))
         bar['value'] = bar_index
         view_percent.configure(text=per+'%')
     except FileNotFoundError:
         not_selecting_alarm()
+        
 def now_dir():
     dir = os.getcwd()
     os.startfile(dir)
@@ -274,8 +295,6 @@ view_status_Frame.grid(row=0, column=0, padx =10 , pady = 10 , ipadx=20, ipady=1
 #view_status_Frame_function
 view_title = Label(view_status_Frame, text="STATUS", bg='gray22', fg='white', font= title)
 view_title.grid(row=0, column=0, sticky='w',padx=10)
-# view_load_btn= Button(view_status_Frame,text="Load File", bg='gray40',fg='white', font = load_font ,command= load_file)
-# view_load_btn.grid(row=0,column=1, sticky='e')
 view_content = Label(view_status_Frame, text="선택하신 파일의 진행상황은", bg='gray22', fg='white' ,font=content)
 view_content.grid(row=1, column=0, sticky='w',padx=10)
 view_content2 = Label(view_status_Frame, text="아래와 같습니다.", bg='gray22', fg='white' ,font=content)
@@ -298,8 +317,8 @@ work_labeling_Frame.columnconfigure(0,weight=1)
 button_font=tk.font.Font(family="맑은 고딕", size=10, weight='bold')
 new_btn = Button(work_labeling_Frame,text=" Sel File",bg='gray28',fg='white', font = button_font, command=start_labeling)
 new_btn.grid(row=0,column=0 ,pady=8,sticky='we')
-load_btn = Button(work_labeling_Frame,text=" File Status", bg='gray28',fg='white', font = button_font ,command=load_file)
-load_btn.grid(row=2,column=0 ,pady=8,ipadx=5,sticky='we')
+file_status = Button(work_labeling_Frame,text=" File Status", bg='gray28',fg='white', font = button_font ,command=load_file)
+file_status.grid(row=2,column=0 ,pady=8,ipadx=5,sticky='we')
 open_btn = Button(work_labeling_Frame,text=" Open Dir", bg='gray28',fg='white', font = button_font, command = now_dir )
 open_btn.grid(row=3,column=0 ,pady=8,ipadx=5,sticky='we')
 #Icon Setting
@@ -309,9 +328,9 @@ try:
     small_logo1 = new_file.subsample(20, 20)
     new_btn.config(image=small_logo1)
     
-    load_file = PhotoImage(file='loading.png')
-    load_btn.config(image=load_file, compound=LEFT)
-    small_logo2 = load_file.subsample(20, 20)
+    load_file_ic = PhotoImage(file='loading.png')
+    load_btn.config(image=load_file_ic, compound=LEFT)
+    small_logo2 = load_file_ic.subsample(20, 20)
     load_btn.config(image=small_logo2)
     
     open_dir = PhotoImage(file='folder.png')
@@ -323,5 +342,4 @@ except TclError:
     print("아이콘 존재하지않음")
 
 
-win.mainloop()
 win.mainloop()
