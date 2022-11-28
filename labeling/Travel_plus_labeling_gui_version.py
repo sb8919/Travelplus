@@ -89,7 +89,7 @@ def KeyClick(labeling_win,file_name,data_file_path,process_label,photo_label,pla
             for k in allow_list:
                 if keyboard.is_pressed(k):
                     if not was_pressed:
-                        th = theme_conv[int(k)+1]
+                        th = theme_conv[int(k)-1]
                         sel_theme.append(th)
                         was_pressed = True
                         zero_working = False
@@ -127,7 +127,8 @@ def KeyClick(labeling_win,file_name,data_file_path,process_label,photo_label,pla
             for k in allow_list:
                 if  keyboard.is_pressed(k):
                     if not was_pressed:
-                        th = theme_conv[int(k)+1]
+                        print(k)
+                        th = theme_conv[int(k)-1]
                         sel_theme.append(th)
                         was_pressed = True
                     else:
@@ -196,7 +197,9 @@ def open_file():
             except FileNotFoundError:
                 tk.messagebox.showerror('파일오류', 'Error: 원본파일과 tmp파일의 위치를 같게 해주세요!')
             df_len=int(df.iloc[-1][0])
-            len(df_list)
+            for dl in df_list[:-1]:
+                label_output.append(dl)
+            print(label_output)
             arr = np.array(df)
             df_list = np.delete(arr, 0, axis = 1)
         start_position(st)
