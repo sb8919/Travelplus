@@ -36,6 +36,7 @@ for i in range(4):
     out_df =pd.DataFrame(out_df) # 최종출력 데이터프레임 생성
     out_df = out_df.dropna() # 값이 없는 값 삭제
     out_df.columns = ['이미지URL','장소','본문','해시태그']
+    out_df.reset_index(drop = True, inplace = True)
     out_df.to_excel('MergeCrolling['+str(i)+']_크롤링.xlsx')
     c += divide
     
