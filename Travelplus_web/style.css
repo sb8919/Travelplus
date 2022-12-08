@@ -151,6 +151,7 @@ color :white
     border-bottom-right-radius: 1em;
     background-color: white;
     padding-top: 50px;
+    text-align:center;
 }
 #progress {
     appearance: none;
