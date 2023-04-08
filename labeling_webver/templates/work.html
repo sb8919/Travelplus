@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>  
+    <title>라벨링 작업</title>
+    <script>
+        window.onload = function() {
+          history.replaceState(null, null, window.location.pathname);
+          var element = document.getElementById("tag");
+            var rect = element.getBoundingClientRect();
+            window.scroll(0, rect.top);
+        };
+    </script>
+    <style>
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="/">Labeling</a>
+          <a style="color:white;">{{name}}님 즐거운 작업하세요!</a>
+        </div>
+    </nav>
+    <div style="display: flex; justify-content: center;">
+        <div style="width: 600px; text-align: left;" style="margin-right:0px;">
+        <div class="m-1" style="display: flex;">
+            <img src="https://blog.kakaocdn.net/dn/c3vWTf/btqUuNfnDsf/VQMbJlQW4ywjeI8cUE91OK/img.jpg" style="width:46px; height:48px;">
+            <p class="pt-2 ms-1" style="display: flex; align-items: center; height: 40px;"><strong>capstone_1zo</strong></p>
+            
+        </div>
+            
+          <img src="static/img/pic.png" style="width: 100%; padding: 0; margin: 0;"/>
+          <div class="m-2">
+            <p><strong>작업현황 {{percent}}%</strong></p>
+            <p>{{content}}</p>
+            <p id="tag" style="color:rgb(89, 129, 237)">{{hashtag}}</p>
+          </div>
+          <form id="travelForm" action="/work_start">
+            <div class="row">
+                <label class="form-check-label" for="checkbox1"><input class="form-check-input ms-1" type="checkbox" id="checkbox1" name="label" value="1"> 1. 가볼만한곳</label><br>
+                <label class="form-check-label" for="checkbox2"><input class="form-check-input ms-1" type="checkbox" id="checkbox2" name="label" value="2"> 2. 가족여행</label><br>
+                <label class="form-check-label" for="checkbox3"><input class="form-check-input ms-1" type="checkbox" id="checkbox3" name="label" value="3"> 3. 우정여행</label><br>
+                <label class="form-check-label" for="checkbox4"><input class="form-check-input ms-1" type="checkbox" id="checkbox4" name="label" value="4"> 4. 전통</label><br>
+                <label class="form-check-label" for="checkbox5"><input class="form-check-input ms-1" type="checkbox" id="checkbox5" name="label" value="5"> 5. 체험</label><br>
+                <label class="form-check-label" for="checkbox6"><input class="form-check-input ms-1" type="checkbox" id="checkbox6" name="label" value="6"> 6. 캠핑</label><br>
+                <label class="form-check-label" for="checkbox7"><input class="form-check-input ms-1" type="checkbox" id="checkbox7" name="label" value="7"> 7. 관람</label><br>
+                <label class="form-check-label" for="checkbox8"><input class="form-check-input ms-1" type="checkbox" id="checkbox8" name="label" value="8"> 8. 맛집</label><br>
+                <label class="form-check-label" for="checkbox9"><input class="form-check-input ms-1" type="checkbox" id="checkbox9" name="label" value="9"> 9. 카페</label><br>
+                <label class="form-check-label" for="checkbox0"><input class="form-check-input ms-1" type="checkbox" id="checkbox0" name="label" value="0"> 0. 스팸</label><br>
+            </div>            
+            <input type="hidden" name="name" value="{{name}}"/>
+            <input type="hidden" id="categoryInput"><br>
+            <button class="btn btn-primary ms-3 mb-3" type="button" onclick="sendRequest()">다음</button>
+          </form>
+        </div>
+      </div>
+      
+    
+    <script>
+        const travelCheckboxes = document.querySelectorAll('.form-check-label input[type="checkbox"]');
+        const spamCheckbox = document.querySelector('input[value="0"]');
+        spamCheckbox.addEventListener('change', function() {
+        if (spamCheckbox.checked) {
+            travelCheckboxes.forEach((checkbox, index) => {
+            if (index !== 10) {
+                checkbox.checked = false;
+                checkbox.disabled = true;
+                spamCheckbox.checked = true;
+                spamCheckbox.disabled = false;
+            }
+            });
+        } else {
+            travelCheckboxes.forEach((checkbox) => {
+            checkbox.disabled = false;
+            });
+        }
+        });
+
+
+        document.addEventListener("keydown", function(event) {
+            const key = event.key;
+            if (key >= 1 && key <= 9) {
+              const checkbox = document.getElementById(`checkbox${key}`);
+              checkbox.checked = !checkbox.checked; // 기존 체크 상태를 반대로 변경
+            }
+            if (key == 0){
+              const checkbox = document.getElementById('checkbox0');
+              checkbox.checked = false;
+              checkbox.disabled = true;
+              const spamCheckbox = document.getElementById('spamCheckbox');
+              spamCheckbox.checked = true;
+              spamCheckbox.disabled = false;
+            }
+            if (event.key === "Enter") {
+                sendRequest();
+            }
+          });
+          
+        function sendRequest() {
+            const name = "{{name}}";
+            let label = [];
+            const checkboxes = document.querySelectorAll('input[type=checkbox]:checked');
+            checkboxes.forEach((checkbox) => {
+              label.push(checkbox.value);
+            });
+            const input = document.getElementById("categoryInput");
+            if (input.value) {
+              label.push(input.value);
+            }
+            const url = `/work_start?label=${label.join(',')}&name=${name}`;
+            window.location.href = url;
+        }
+      
+        const checkboxes = document.querySelectorAll('input[type=checkbox]');
+        checkboxes.forEach((checkbox) => {
+          checkbox.addEventListener("keydown", function(event) {
+            if (event.key === "Enter") {
+              checkbox.checked = !checkbox.checked;
+            }
+          });
+        });
+      
+        const input = document.getElementById("categoryInput");
+        input.addEventListener("keydown", function(event) {
+          if (event.key === "Enter") {
+            sendRequest();
+          }
+        });
+      </script>
+</body>
+</html>

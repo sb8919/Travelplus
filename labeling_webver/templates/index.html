@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+  <title>라벨링사이트</title>
+</head>
+    <!-- As a link -->
+  
+
+  <style>
+    html,
+    body {
+      height: 100%;
+    }
+
+    #main {
+      display: -ms-flexbox;
+      display: flex;
+      -ms-flex-align: center;
+      align-items: center;
+      padding-top: 40px;
+      padding-bottom: 40px;
+    }
+
+    .form-signin {
+      width: 100%;
+      max-width: 330px;
+      padding: 15px;
+      margin: auto;
+    }
+    .form-signin .checkbox {
+      font-weight: 400;
+    }
+    .form-signin .form-control {
+      position: relative;
+      box-sizing: border-box;
+      height: auto;
+      padding: 10px;
+      font-size: 16px;
+    }
+    .form-signin .form-control:focus {
+      z-index: 2;
+    }
+    .form-signin input[id="uid"] {
+      margin-bottom: -1px;
+      border-bottom-right-radius: 0;
+      border-bottom-left-radius: 0;
+    }
+    .form-signin input[id="pwd"] {
+      margin-bottom: 10px;
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+    }
+    .fixed-button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 999;
+    }
+    
+    .fixed-button a {
+      display: block;
+      background-color: #007bff;
+      color: #fff;
+      text-align: center;
+      padding: 10px 15px;
+      border-radius: 50%;
+      box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+      transition: all 0.2s ease-in-out;
+    }
+    
+    .fixed-button a:hover {
+      background-color: #0062cc;
+      box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+      transform: scale(1.1);
+    }
+    
+    .fixed-button i {
+      font-size: 24px;
+      line-height: 1;
+    }
+    
+  </style>
+
+  
+  <!-- Custom styles for this template -->
+  <link href="/static/signin.css" rel="stylesheet">
+</head>
+<body class="text-center">
+
+  <nav class="navbar navbar-dark bg-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="/">Labeling</a>
+    </div>
+  </nav>
+  <div id="main">
+    <main class="form-signin">
+      <form action="/work_on" methods="POST">
+          <img class="mb-4" src="https://cdn-icons-png.flaticon.com/512/5074/5074691.png" alt="" width="72" height="57">
+          <h1 class="h3 mb-3 fw-normal">작업자 이름을 써주세요</h1>
+          <label for="text" class="visually-hidden">이름을 입력하세요.</label>
+          <input type="text" name="name" class="form-control" placeholder="이름을 입력하세요" required autofocus>
+          <div class="checkbox mb-3">
+          </div>
+          <button class="w-100 btn btn-lg btn-primary" type="submit">Start Work</button>
+      </form>
+      <button onclick="window.location.href='/file_download'" class="w-100 btn btn-lg btn-outline-primary mt-2" >File Download</button>
+      <button onclick="window.location.href='/report'" class="w-100 btn btn-lg btn-outline-danger mt-2" >Report</button>
+    </main>
+  </div>
+  <div class="fixed-button">
+    <a href="/upload">
+      <i class="fa fa-upload"></i>
+    </a>
+  </div>
+</body>
+</html>
