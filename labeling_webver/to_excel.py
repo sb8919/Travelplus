@@ -21,7 +21,7 @@ def file_download(data):
 
     df = pd.DataFrame({'본문': content, '태그': hashtag, '장소': place, '라벨': label})
 
-    path = '/root/web/static/data/labeling_data.xlsx'
+    path = '/root/web/Travel_plus_parsing_web/static/data/labeling_data.xlsx'
     
     df.to_excel(path)
     
