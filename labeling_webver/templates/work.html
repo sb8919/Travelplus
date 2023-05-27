@@ -35,7 +35,7 @@
             
           <img src="static/img/pic.png" style="width: 100%; padding: 0; margin: 0;"/>
           <div class="m-2">
-            <p><strong>작업현황 {{percent}}%</strong></p>
+            <p><strong>작업현황 {{percent}}개 남음</strong></p>
             <p>{{content}}</p>
             <p id="tag" style="color:rgb(89, 129, 237)">{{hashtag}}</p>
           </div>
@@ -61,75 +61,87 @@
       
     
     <script>
-        const travelCheckboxes = document.querySelectorAll('.form-check-label input[type="checkbox"]');
-        const spamCheckbox = document.querySelector('input[value="0"]');
-        spamCheckbox.addEventListener('change', function() {
+      const travelCheckboxes = document.querySelectorAll('.form-check-label input[type="checkbox"]');
+      const spamCheckbox = document.querySelector('input[value="0"]');
+      
+      spamCheckbox.addEventListener('change', function() {
         if (spamCheckbox.checked) {
-            travelCheckboxes.forEach((checkbox, index) => {
+          travelCheckboxes.forEach((checkbox, index) => {
             if (index !== 10) {
-                checkbox.checked = false;
-                checkbox.disabled = true;
-                spamCheckbox.checked = true;
-                spamCheckbox.disabled = false;
-            }
-            });
-        } else {
-            travelCheckboxes.forEach((checkbox) => {
-            checkbox.disabled = false;
-            });
-        }
-        });
-
-
-        document.addEventListener("keydown", function(event) {
-            const key = event.key;
-            if (key >= 1 && key <= 9) {
-              const checkbox = document.getElementById(`checkbox${key}`);
-              checkbox.checked = !checkbox.checked; // 기존 체크 상태를 반대로 변경
-            }
-            if (key == 0){
-              const checkbox = document.getElementById('checkbox0');
               checkbox.checked = false;
               checkbox.disabled = true;
-              const spamCheckbox = document.getElementById('spamCheckbox');
               spamCheckbox.checked = true;
               spamCheckbox.disabled = false;
             }
-            if (event.key === "Enter") {
-                sendRequest();
-            }
           });
-          
-        function sendRequest() {
-            const name = "{{name}}";
-            let label = [];
-            const checkboxes = document.querySelectorAll('input[type=checkbox]:checked');
-            checkboxes.forEach((checkbox) => {
-              label.push(checkbox.value);
-            });
-            const input = document.getElementById("categoryInput");
-            if (input.value) {
-              label.push(input.value);
-            }
-            const url = `/work_start?label=${label.join(',')}&name=${name}`;
-            window.location.href = url;
+        } else {
+          travelCheckboxes.forEach((checkbox) => {
+            checkbox.disabled = false;
+          });
         }
+      });
       
-        const checkboxes = document.querySelectorAll('input[type=checkbox]');
+      document.addEventListener("keydown", function(event) {
+        const key = event.key;
+        if (key >= 1 && key <= 9) {
+          const checkbox = document.getElementById(`checkbox${key}`);
+          if (!spamCheckbox.checked) {
+            checkbox.checked = !checkbox.checked;
+          }
+        }
+        if (key == 0) {
+          if (spamCheckbox) {
+            travelCheckboxes.forEach((checkbox, index) => {
+              if (index !== 10) {
+                checkbox.checked = false;
+                checkbox.disabled = true;
+              }
+            });
+            spamCheckbox.checked = true;
+            spamCheckbox.disabled = false;
+          } else {
+            console.error('spamCheckbox element not found');
+          }
+        }
+        if (event.key === "Enter") {
+          sendRequest();
+        }
+      });
+      
+      
+
+      
+      function sendRequest() {
+        const name = "{{name}}";
+        let label = [];
+        const checkboxes = document.querySelectorAll('input[type=checkbox]:checked');
         checkboxes.forEach((checkbox) => {
-          checkbox.addEventListener("keydown", function(event) {
-            if (event.key === "Enter") {
-              checkbox.checked = !checkbox.checked;
-            }
-          });
+          label.push(checkbox.value);
         });
-      
         const input = document.getElementById("categoryInput");
-        input.addEventListener("keydown", function(event) {
+        if (input.value) {
+          label.push(input.value);
+        }
+        const url = `/work_start?label=${label.join(',')}&name=${name}`;
+        window.location.href = url;
+      }
+      
+      const checkboxes = document.querySelectorAll('input[type=checkbox]');
+      checkboxes.forEach((checkbox) => {
+        checkbox.addEventListener("keydown", function(event) {
           if (event.key === "Enter") {
-            sendRequest();
+            checkbox.checked = !checkbox.checked;
           }
         });
+      });
+      
+      const input = document.getElementById("categoryInput");
+      input.addEventListener("keydown", function(event) {
+        if (event.key === "Enter") {
+          sendRequest();
+        }
+      });
+      
       </script>
 </body>
 </html>

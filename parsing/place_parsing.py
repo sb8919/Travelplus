@@ -1,5 +1,6 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
 from bs4 import BeautifulSoup
 import time
 import re
@@ -66,8 +67,11 @@ def move_next(driver):
 
 def parse_start(id, pw, hashtag_list):
     # 크롬 브라우저 열기
-    driver = webdriver.Chrome('chromedriver.exe')
-
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    driver = webdriver.Chrome(executable_path="/usr/lib/chromium-browser/chromedriver", options=chrome_options)
     driver.get('https://www.instagram.com')
     time.sleep(5)
 
@@ -97,7 +101,7 @@ def parse_start(id, pw, hashtag_list):
 def parsing(driver,url,pl):
     # 검색 결과 페이지 열기
     driver.get(url)
-    time.sleep(11)  # 코드 수행 시간
+    time.sleep(8)  # 코드 수행 시간
 
     try:# 첫 번째 게시물 클릭
         select_first(driver)
@@ -105,7 +109,7 @@ def parsing(driver,url,pl):
         # 본격적으로 데이터 수집 시작
         results = []
         ## 수집할 게시물의 수
-        target = 50
+        target = 100
 
         tmp_url = ''
         for i in range(target):
@@ -140,7 +144,8 @@ def parsing(driver,url,pl):
 id = "parsingtag3"
 pw = "zoqtmxhs"
 
-hashtag_list = ['평화광장', '유달산','톱머리','노을공원','갓바위','연희네슈퍼','목포근대역사관','삼학도공원','유달산장']
+hashtag_list = ['캠핑', '캠퍼','캠핑장추천','디저트','액티비티','액티비티추천','경비행기','패러글라이딩','체험','스카이워크','요트','루지','양궁','사격','전통체험','체험농장','문화유산','왕실문화','유물','역사','문화재청','미술관',
+                '박물관','전시','전시회','먹방로드','먹스타그램','공방','커플여행,','우정여행','가족여행']
 
 parse_start(id,pw,hashtag_list)
 

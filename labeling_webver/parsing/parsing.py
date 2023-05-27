@@ -175,7 +175,7 @@ def parsing(driver,url,pl, hashtag):
 # 인스타그램 아이디, 비번, 해시태그 입력하는곳
 id = "parsingtag"
 pw = "zoqtmxhs"
-hashtag_list = ['가볼만한곳', '가족여행','가을여행','놀러갈만한곳','문화생활','봄여행','여름여행','여행스타그램','휴가']
+hashtag_list = ['먹스타그램', '먹스타','카페','분좋카','분위기좋은카페']
 
 parse_start(id,pw,hashtag_list)
 

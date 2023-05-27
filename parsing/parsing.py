@@ -98,7 +98,7 @@ def parse_start(id, pw, hashtag_list):
     driver.get('https://www.instagram.com')
     time.sleep(5)
 
-    # 인스타그램 로그인을 위한 계정 정보
+    # 인스타그램 로그인을 위한 계정 정보 
     insta_id = id
     input_id = driver.find_element(By.CSS_SELECTOR, '#loginForm > div > div:nth-child(1) > div > label > input')
     input_id.clear()
@@ -115,13 +115,19 @@ def parse_start(id, pw, hashtag_list):
 
     # 게시물을 조회할 검색 키워드 입력 요청
     place_zip = get_place()
+    total_count = len(hashtag_list) * len(place_zip)
+    count = 0
     for hashtag in hashtag_list:
         place_zip = get_place()
         print(hashtag,'진행중')
         for pl in place_zip:
-            word = pl + hashtag
+            count += 1
+            word = str(pl) + str(hashtag)
             url = insta_searching(word)
+            print(f"{count}/{total_count} ({count/total_count*100:.2f}%) 완료됨")
             parsing(driver, url, pl, hashtag)
+        print(hashtag,' 완료')
+
 
 
 
@@ -136,7 +142,7 @@ def parsing(driver,url,pl, hashtag):
         # 본격적으로 데이터 수집 시작
         results = []
         ## 수집할 게시물의 수
-        target = 50
+        target = 20
 
         tmp_url = ''
         for i in range(target):
@@ -177,10 +183,9 @@ def parsing(driver,url,pl, hashtag):
 # 인스타그램 아이디, 비번, 해시태그 입력하는곳
 id = "parsingtag"   
 pw = "zoqtmxhs"
-hashtag="가볼만한곳"
-hashtag_list = ['가볼만한곳', '가족여행','가을여행',
-                '놀러갈만한곳','문화생활','봄여행',
-                '여름여행','여행스타그램','휴가']
+# hashtag="가볼만한곳"
+hashtag_list = [ '카페추천','여행',
+                '데이트','휴가']
 
 parse_start(id,pw,hashtag_list)
 

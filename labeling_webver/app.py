@@ -22,7 +22,7 @@ def save_img(data):
         urllib.request.urlretrieve(data[2], path)
     except:
         urllib.request.urlretrieve('https://cdn-icons-png.flaticon.com/512/3875/3875148.png', path)
-    
+        
 @app.route("/") 
 def index():
     return render_template('index.html')
@@ -39,9 +39,9 @@ def work_on():
         hashtag=data[1]
         save_img(data)
         if lb_st_num >= lb_end_num:
-            return '할당량을 다 마쳤습니다'
+            return render_template("congratulation.html")
         else:
-            percent = int(((700-(lb_end_num-lb_st_num)) /700 ) * 100)
+            percent = int(lb_end_num-lb_st_num)
             return render_template('work.html',content=content, hashtag= hashtag,name = name,percent=percent)
     except TypeError:
         return render_template('unknown.html')
@@ -57,7 +57,7 @@ def work_start():
     labeling.update("UPDATE labeling SET label ='%s' where No=%s"%(label,lb_num))
     userdb.update("UPDATE user SET start_label ='%s' where name = '%s'"%((int(lb_num)+1),name))
     if lb_end_num <= lb_st_num:
-        return '할당량을 완료했습니다.'
+        return render_template("congratulation.html")
     try:
         data = data[0]
         content=data[0]
@@ -65,14 +65,14 @@ def work_start():
         save_img(data)
     except IndexError:
         return render_template("index.html")
-    percent = int(((700-(lb_end_num-lb_st_num)) /700 ) * 100)
+    percent = int(lb_end_num-lb_st_num)
     return render_template("work.html",content=content, hashtag= hashtag ,name = name, percent=percent )
     
 @app.route("/file_download") 
 def file_download():
     file_data = labeling.fetch_all("SELECT * FROM labeling WHERE label != 'None'")
     to_excel.file_download(file_data)
-    path = '/root/web/static/data/labeling_data.xlsx'
+    path = '/root/web/Travel_plus_parsing_web/static/data/labeling_data.xlsx'
     return send_file(path,as_attachment=True)   
 
 
@@ -80,7 +80,7 @@ def file_download():
 def file_upload():
     if request.method == 'POST':
         file = request.files['file']
-        file.save(os.path.join('/root/web/static/data/upload/', 'upload.xlsx'))
+        file.save(os.path.join('/root/web/Travel_plus_parsing_web/static/data/upload/', 'upload.xlsx'))
         upload_data.insert_data_to_db()
         return render_template('index.html')   
     return render_template('file_upload.html')    
@@ -90,18 +90,31 @@ def init_index():
     labeling.execute('ALTER TABLE label_Data.labeling AUTO_INCREMENT = 1;')
     return '초기화 완료'
 
+from collections import defaultdict
+@app.route("/report") 
+def report():
+    label_list = labeling.fetch_all("SELECT label FROM labeling WHERE label != 'None'")
+    label_count = defaultdict(int)
+    for label in label_list:
+        for l in label[0].split(","):
+            if l:
+                label_count[l] += 1
+    label_count = dict(sorted(label_count.items()))
+    return render_template('report.html',label_count = label_count ,total_labeling = sum(label_count.values()))  
+
+    
 @app.route('/merge_upload', methods=['GET', 'POST'])
 def merge_upload():
     if request.method == 'POST':
         files = request.files.getlist('file')
         for file in files:
             filename = file.filename
-            file.save(os.path.join('/root/web/static/data/merge/', filename))
+            file.save(os.path.join('/root/web/Travel_plus_parsing_web/static/data/merge/', filename))
         merge_xlsx.merge_start()
-        path = '/root/web/static/data/merge/'
+        path = '/root/web/Travel_plus_parsing_web/static/data/merge/'
         for filename in os.listdir(path):
             file_path = os.path.join(path, filename)
-            if os.path.isfile(file_path):
+            if os.path.isfile(file_path):   
                 os.remove(file_path)
         return send_file(path+'complete/complete.xlsx',as_attachment=True)
     else:

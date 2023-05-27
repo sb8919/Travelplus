@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Report System</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
+            integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+        <link rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
+            crossorigin="anonymous"></script>
+        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+        <style>
+            @font-face {
+                font-family: 'TheJamsil5Bold';
+                src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2302_01@1.0/TheJamsil5Bold.woff2') format('woff2');
+                font-weight: 700;
+                font-style: normal;
+            }
+
+            body {
+                font-family: 'TheJamsil5Bold';
+            }
+
+            nav {
+                font-family: initial;
+            }
+
+            .col {
+                width: auto;
+            }
+
+            #graph,
+            #pie_chart {
+                width: 100%;
+            }
+
+            ol {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            ol li:before {
+                content: counters(item, ".")->" ";
+                counter-increment: item;
+            }
+
+            table {
+                border-collapse: collapse;
+                width: 50%;
+            }
+
+            th,
+            td {
+                border: 1px solid #dddddd;
+                text-align: left;
+                padding: 8px;
+            }
+
+            th {
+                background-color: #f2f2f2;
+            }
+        </style>
+    </head>
+
+    <body>
+        <nav class="navbar navbar-dark bg-dark">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="/">Labeling</a>
+            </div>
+        </nav>
+        <div class="card m-2">
+            <div class="card-title p-2">
+                <h2>현재 라벨링완료 개수🙄</h2>
+                <h4 class="card-text ps-2 text-danger">{{total_labeling}}</h4>
+            </div>
+        </div>
+        <div class="card m-2">
+            <div class="card-title p-2">
+                <h2>테마 가이드😎</h2>
+                <h4 class="card-text ps-1 text-primary">
+                    <ol>
+                        <li value="0">0 &#8594; 스팸</li>
+                        <li value="1">1 &#8594; 가볼만한곳</li>
+                        <li value="2">2 &#8594; 가족여행</li>
+                        <li value="3">3 &#8594; 관람</li>
+                        <li value="4">4 &#8594; 맛집</li>
+                        <li value="5">5 &#8594; 우정여행</li>
+                        <li value="6">6 &#8594; 전통</li>
+                        <li value="7">7 &#8594; 체험</li>
+                        <li value="8">8 &#8594; 카페</li>
+                        <li value="9">9 &#8594; 캠핑</li>
+                    </ol>
+                </h4>
+            </div>
+        </div>
+        <div class="card m-2">
+            <h2 class="card-title p-2">라벨링 분석</h2>
+            <div class="card-body text-left">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>라벨</th>
+                            <th>개수</th>
+                        </tr>
+                    </thead>
+                    <tbody id="data-table-body">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div id="chart">
+            <div class="card m-2">
+                <div class="card-body p-0">
+                    <div class="chart-container">
+                        <div id="graph"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="card m-2">
+                <div class="card-body p-0">
+                    <div class="chart-container">
+                        <div id="pie_chart"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            var label_count = {{ label_count | tojson | safe }};
+
+            var x = Object.keys(label_count);
+            var y = Object.values(label_count);
+            var colors = ['#FF69B4', '#FFC0CB', '#FFB6C1', '#FF1493', '#DB7093', '#C71585', '#BA55D3', '#9400D3', '#8A2BE2', '#6A5ACD'];
+            var trace = {
+                x: x,
+                y: y,
+                type: 'bar',
+                marker: {
+                    color: colors
+                }
+            };
+            var layout = {
+                title: '라벨링 막대차트',
+                xaxis: { dtick: 1 }
+            };
+            var data = [trace];
+            Plotly.newPlot('graph', data, layout, { responsive: true });
+
+
+
+
+            var labels = Object.keys(label_count);
+            var values = Object.values(label_count);
+            var data = [{
+                values: values,
+                labels: labels,
+                type: 'pie'
+            }];
+            var layout = {
+                title: '라벨링 파이차트'
+            };
+            Plotly.newPlot('pie_chart', data, layout, { responsive: true });
+            
+            const labelCount = {{ label_count | tojson }};
+            const tableBody = document.getElementById('data-table-body');
+
+            for (const key in labelCount) {
+                const row = document.createElement('tr');
+                const keyCell = document.createElement('td');
+                const valueCell = document.createElement('td');
+
+                keyCell.textContent = key;
+                valueCell.textContent = labelCount[key];
+
+                row.appendChild(keyCell);
+                row.appendChild(valueCell);
+                tableBody.appendChild(row);
+            }
+        </script>
+    </body>
+
+</html>
