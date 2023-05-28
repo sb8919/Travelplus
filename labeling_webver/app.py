@@ -13,8 +13,12 @@ import merge_xlsx
 
 app = Flask(__name__)
 
+# 라벨링 데이터베이스
 userdb = dbcl.DBconnector('user')
 labeling = dbcl.DBconnector('label_Data')
+
+# 앱 데이터베이스
+TravelplusDB = dbcl.DBconnector('Travelplus')
 
 def save_img(data):
     path='static/img/pic.png'
@@ -22,7 +26,8 @@ def save_img(data):
         urllib.request.urlretrieve(data[2], path)
     except:
         urllib.request.urlretrieve('https://cdn-icons-png.flaticon.com/512/3875/3875148.png', path)
-        
+
+# 라벨링 웹 --------------------------------------------------------------------------------------------------------------        
 @app.route("/") 
 def index():
     return render_template('index.html')
@@ -127,6 +132,16 @@ def merge_upload():
         return send_file(path+'complete/complete.xlsx',as_attachment=True)
     else:
         return render_template('file_upload.html')
+#-------------------------------------------------------------------------------------------------------------
+@app.route("/user_info") 
+def user_info():
+    user_data = TravelplusDB.fetch_all("SELECT * FROM User")[0]
+    print(user_data)
+    return jsonify(user_data)
+
+
+
+#앱 정보조회 ---------------------------------------------------------------------------------------------------
     
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=3000)
