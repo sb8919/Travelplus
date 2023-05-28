@@ -22,6 +22,7 @@ def file_download(data):
 
     df = pd.DataFrame({'본문': content, '태그': hashtag, '장소': place, '라벨': label})
 
+<<<<<<< HEAD
     path = '/root/web/Travelplus/labeling_webver/static/data/labeling_data.xlsx'
     
     df.to_excel(path)
@@ -50,6 +51,9 @@ def file_download_one(data):
     df = pd.DataFrame({'본문': content, '태그': hashtag, '장소': place, '라벨': label})
 
     path = '/root/web/Travelplus/labeling_webver/static/data/labeling_data.xlsx'
+=======
+    path = '/root/web/Travel_plus_parsing_web/static/data/labeling_data.xlsx'
+>>>>>>> b420f42b34f0016ef9e2661bc5da219e3d7ed309
     
     df.to_excel(path)
     
