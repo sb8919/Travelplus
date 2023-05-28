@@ -72,7 +72,6 @@ def work_start():
 def file_download():
     file_data = labeling.fetch_all("SELECT * FROM labeling WHERE label != 'None' ")
     to_excel.file_download(file_data)
-<<<<<<< HEAD
     path = '/root/web/Travelplus/labeling_webver/static/data/labeling_data.xlsx'
     return send_file(path,as_attachment=True)    
 
@@ -82,9 +81,6 @@ def file_download_one():
     file_data = labeling.fetch_all("SELECT * FROM labeling WHERE label != 'None' ")
     to_excel.file_download_one(file_data)
     path = '/root/web/Travelplus/labeling_webver/static/data/labeling_data.xlsx'
-=======
-    path = '/root/web/Travel_plus_parsing_web/static/data/labeling_data.xlsx'
->>>>>>> b420f42b34f0016ef9e2661bc5da219e3d7ed309
     return send_file(path,as_attachment=True)   
 
 
@@ -92,11 +88,7 @@ def file_download_one():
 def file_upload():
     if request.method == 'POST':
         file = request.files['file']
-<<<<<<< HEAD
         file.save(os.path.join('//root/web/Travelplus/labeling_webver/static/data/upload/', 'upload.xlsx'))
-=======
-        file.save(os.path.join('/root/web/Travel_plus_parsing_web/static/data/upload/', 'upload.xlsx'))
->>>>>>> b420f42b34f0016ef9e2661bc5da219e3d7ed309
         upload_data.insert_data_to_db()
         return render_template('index.html')   
     return render_template('file_upload.html')    
@@ -125,15 +117,9 @@ def merge_upload():
         files = request.files.getlist('file')
         for file in files:
             filename = file.filename
-<<<<<<< HEAD
             file.save(os.path.join('/root/web/Travelplus/labeling_webver/static/data/merge/', filename))
         merge_xlsx.merge_start()
         path = '/root/web/Travelplus/labeling_webver/static/data/merge/'
-=======
-            file.save(os.path.join('/root/web/Travel_plus_parsing_web/static/data/merge/', filename))
-        merge_xlsx.merge_start()
-        path = '/root/web/Travel_plus_parsing_web/static/data/merge/'
->>>>>>> b420f42b34f0016ef9e2661bc5da219e3d7ed309
         for filename in os.listdir(path):
             file_path = os.path.join(path, filename)
             if os.path.isfile(file_path):   
